@@ -46,6 +46,10 @@ impl Tetrad {
             self.w / factor,
         )
     }
+
+    pub fn magnitude(&self) -> f64 {
+        (self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w).sqrt()
+    }
 }
 
 impl Add<Tetrad> for Tetrad {
@@ -130,5 +134,17 @@ mod tests {
     fn test_scale_inverse() {
         let tetrad = Tetrad::new(3.0, -2.0, 5.0, 1.0);
         assert_eq!(tetrad.scale_inverse(2.0), Tetrad::new(1.5, -1.0, 2.5, 0.5));
+    }
+
+    #[test]
+    fn test_magnitude() {
+        let vector = Tetrad::vector(1.0, 0.0, 0.0);
+        assert_eq!(vector.magnitude(), 1.0);
+        let vector = Tetrad::vector(0.0, 1.0, 0.0);
+        assert_eq!(vector.magnitude(), 1.0);
+        let vector = Tetrad::vector(0.0, 0.0, 1.0);
+        assert_eq!(vector.magnitude(), 1.0);
+        let vector = Tetrad::vector(1.0, -2.0, 3.0);
+        assert_eq!(vector.magnitude(), 14.0_f64.sqrt());
     }
 }
