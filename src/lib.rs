@@ -1,10 +1,15 @@
 use std::ops::{Add, Neg, Sub};
 
+/// Representation for both vectors and points.
 #[derive(Debug, PartialEq)]
 pub struct Tetrad {
+    /// x coordinate
     x: f64,
+    /// y coordinate
     y: f64,
+    /// z coordinate
     z: f64,
+    /// w coordinate; 1.0 for points, 0.0 for vectors
     w: f64,
 }
 
@@ -13,22 +18,87 @@ impl Tetrad {
         Tetrad { x, y, z, w }
     }
 
+    /// Returns a new point.
+    ///
+    /// # Arguments
+    ///
+    /// * `x` the x coordinate
+    /// * `y` the y coordinate
+    /// * `z` the z coordinate
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use noray::Tetrad;
+    /// let point: Tetrad = Tetrad::point(1.0, 2.0, 3.0);
+    /// ```
     pub fn point(x: f64, y: f64, z: f64) -> Tetrad {
         Tetrad::new(x, y, z, 1.0)
     }
 
+    /// Returns a new vector.
+    ///
+    /// # Arguments
+    ///
+    /// * `x` the x coordinate
+    /// * `y` the y coordinate
+    /// * `z` the z coordinate
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use noray::Tetrad;
+    /// let vector: Tetrad = Tetrad::vector(1.0, 2.0, 3.0);
+    /// ```
     pub fn vector(x: f64, y: f64, z: f64) -> Tetrad {
         Tetrad::new(x, y, z, 0.0)
     }
 
+    /// Returns `true` if tetrad is a point, `false` otherwise.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use noray::Tetrad;
+    /// let point: Tetrad = Tetrad::point(1.0, 2.0, 3.0);
+    /// assert_eq!(point.is_point(), true);
+    /// let vector: Tetrad = Tetrad::vector(1.0, 2.0, 3.0);
+    /// assert_eq!(vector.is_point(), false);
+    /// ```
     pub fn is_point(&self) -> bool {
         (self.w - 1.0).abs() < f64::EPSILON
     }
 
+    /// Returns `true` if tetrad is a vector, `false` otherwise.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use noray::Tetrad;
+    /// let vector = Tetrad::vector(1.0, 2.0, 3.0);
+    /// assert_eq!(vector.is_vector(), true);
+    /// let point = Tetrad::point(1.0, 2.0, 3.0);
+    /// assert_eq!(point.is_vector(), false);
+    /// ```
     pub fn is_vector(&self) -> bool {
         (self.w - 0.0).abs() < f64::EPSILON
     }
 
+    /// Returns a new tetrad scale by the factor.
+    ///
+    /// # Arguments
+    ///
+    /// * `factor` the multiplicative factor
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use noray::Tetrad;
+    /// let point: Tetrad = Tetrad::point(1.0, 2.0, 3.0);
+    /// let scaled_point: Tetrad = point.scale(15.0);
+    /// let vector: Tetrad = Tetrad::vector(1.0, 2.0, 3.0);
+    /// let scaled_vector: Tetrad = vector.scale(5.0);
+    /// ```
     pub fn scale(&self, factor: f64) -> Tetrad {
         Tetrad::new(
             self.x * factor,
@@ -38,6 +108,21 @@ impl Tetrad {
         )
     }
 
+    /// Returns a new tetrad scaled by the inverse of the factor.
+    ///
+    /// # Arguments
+    ///
+    /// * `factor` the divisitive factor
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use noray::Tetrad;
+    /// let point: Tetrad = Tetrad::point(1.0, 2.0, 3.0);
+    /// let scaled_point: Tetrad = point.scale_inverse(15.0);
+    /// let vector: Tetrad = Tetrad::vector(1.0, 2.0, 3.0);
+    /// let scaled_vector: Tetrad = vector.scale_inverse(5.0);
+    /// ```
     pub fn scale_inverse(&self, factor: f64) -> Tetrad {
         Tetrad::new(
             self.x / factor,
@@ -47,18 +132,64 @@ impl Tetrad {
         )
     }
 
+    /// Returns the magnitude of a vector.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use noray::Tetrad;
+    /// let vector: Tetrad = Tetrad::vector(1.0, 2.0, 3.0);
+    /// let magnitude: f64 = vector.magnitude();
+    /// ```
     pub fn magnitude(&self) -> f64 {
         (self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w).sqrt()
     }
 
+    /// Returns a normal version of a vector.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use noray::Tetrad;
+    /// let vector = Tetrad::vector(1.0, 2.0, 3.0);
+    /// let normalized: Tetrad = vector.normalize();
+    /// ```
     pub fn normalize(&self) -> Tetrad {
         self.scale_inverse(self.magnitude())
     }
 
+    /// Returns the dot product of two vectors.
+    ///
+    /// # Arguments
+    ///
+    /// * `rhs` the second vector in the product
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use noray::Tetrad;
+    /// let vector1: Tetrad = Tetrad::vector(1.0, 2.0, 3.0);
+    /// let vector2: Tetrad = Tetrad::vector(7.0, 8.0, 9.0);
+    /// let dot_product: f64 = vector1.dot(&vector2);
+    /// ```
     pub fn dot(&self, rhs: &Tetrad) -> f64 {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z + self.w * rhs.w
     }
 
+    /// Returns the cross product of two vectors in a left-handed coordinate system.
+    ///
+    /// # Arguments
+    ///
+    /// * `rhs` the second vector in the product
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use noray::Tetrad;
+    /// let vector1: Tetrad = Tetrad::vector(1.0, 2.0, 3.0);
+    /// let vector2: Tetrad = Tetrad::vector(7.0, 8.0, 9.0);
+    /// let cross_product: Tetrad = vector1.cross(&vector2);
+    /// ```
     pub fn cross(&self, rhs: &Tetrad) -> Tetrad {
         Tetrad::vector(
             self.y * rhs.z - self.z * rhs.y,
@@ -71,6 +202,20 @@ impl Tetrad {
 impl Add<Tetrad> for Tetrad {
     type Output = Tetrad;
 
+    /// Returns the sum of two tetrads.
+    ///
+    /// # Arguments
+    ///
+    /// * `rhs` the other tetrad
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use noray::Tetrad;
+    /// let tetrad1: Tetrad = Tetrad::vector(1.0, 2.0, 3.0);
+    /// let tetrad2: Tetrad = Tetrad::vector(9.0, 8.0, 7.0);
+    /// let sum: Tetrad = tetrad1 + tetrad2;
+    /// ```
     fn add(self, rhs: Tetrad) -> Tetrad {
         Tetrad::new(
             self.x + rhs.x,
@@ -84,6 +229,19 @@ impl Add<Tetrad> for Tetrad {
 impl Neg for Tetrad {
     type Output = Tetrad;
 
+    /// Returns the sum of two tetrads.
+    ///
+    /// # Arguments
+    ///
+    /// * `rhs` the other tetrad
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use noray::Tetrad;
+    /// let tetrad: Tetrad = Tetrad::vector(1.0, 2.0, 3.0);
+    /// let negation: Tetrad = -tetrad;
+    /// ```
     fn neg(self) -> Tetrad {
         Tetrad::new(-self.x, -self.y, -self.z, -self.w)
     }
@@ -92,6 +250,20 @@ impl Neg for Tetrad {
 impl Sub<Tetrad> for Tetrad {
     type Output = Tetrad;
 
+    /// Returns the sum of two tetrads.
+    ///
+    /// # Arguments
+    ///
+    /// * `rhs` the other tetrad
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use noray::Tetrad;
+    /// let tetrad1: Tetrad = Tetrad::point(1.0, 2.0, 3.0);
+    /// let tetrad2: Tetrad = Tetrad::point(9.0, 8.0, 7.0);
+    /// let difference: Tetrad = tetrad1 + tetrad2;
+    /// ```
     fn sub(self, rhs: Tetrad) -> Tetrad {
         Tetrad::new(
             self.x - rhs.x,
