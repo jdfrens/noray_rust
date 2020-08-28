@@ -1,3 +1,5 @@
+use std::ops::Add;
+
 #[derive(Debug, PartialEq)]
 pub struct Tetrad {
     x: f64,
@@ -28,6 +30,19 @@ impl Tetrad {
     }
 }
 
+impl Add<Tetrad> for Tetrad {
+    type Output = Tetrad;
+
+    fn add(self, rhs: Tetrad) -> Tetrad {
+        Tetrad::new(
+            self.x + rhs.x,
+            self.y + rhs.y,
+            self.z + rhs.z,
+            self.w + rhs.w,
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -44,5 +59,12 @@ mod tests {
         let tetrad = Tetrad::vector(1.0, 2.0, 3.0);
         assert_eq!(tetrad.is_vector(), true);
         assert_eq!(tetrad.is_point(), false);
+    }
+
+    #[test]
+    fn test_add() {
+        let tetrad1 = Tetrad::new(3.0, -2.0, 5.0, 1.0);
+        let tetrad2 = Tetrad::new(-2.0, 3.0, 1.0, 0.0);
+        assert_eq!(tetrad1 + tetrad2, Tetrad::new(1.0, 1.0, 6.0, 1.0));
     }
 }
