@@ -1,4 +1,4 @@
-use std::ops::{Add, Sub};
+use std::ops::{Add, Neg, Sub};
 
 #[derive(Debug, PartialEq)]
 pub struct Tetrad {
@@ -43,6 +43,14 @@ impl Add<Tetrad> for Tetrad {
     }
 }
 
+impl Neg for Tetrad {
+    type Output = Tetrad;
+
+    fn neg(self) -> Tetrad {
+        Tetrad::new(-self.x, -self.y, -self.z, -self.w)
+    }
+}
+
 impl Sub<Tetrad> for Tetrad {
     type Output = Tetrad;
 
@@ -82,9 +90,15 @@ mod tests {
     }
 
     #[test]
-    fn test_subtract() {
+    fn test_sub() {
         let tetrad1 = Tetrad::new(3.0, -2.0, 5.0, 1.0);
         let tetrad2 = Tetrad::new(-2.0, 3.0, 1.0, 0.0);
         assert_eq!(tetrad1 - tetrad2, Tetrad::new(5.0, -5.0, 4.0, 1.0));
+    }
+
+    #[test]
+    fn test_neg() {
+        let tetrad = Tetrad::new(3.0, -2.0, 5.0, 1.0);
+        assert_eq!(-tetrad, Tetrad::new(-3.0, 2.0, -5.0, -1.0));
     }
 }
