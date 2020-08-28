@@ -28,6 +28,15 @@ impl Tetrad {
     pub fn is_vector(&self) -> bool {
         (self.w - 0.0).abs() < f64::EPSILON
     }
+
+    pub fn scale(&self, factor: f64) -> Tetrad {
+        Tetrad::new(
+            self.x * factor,
+            self.y * factor,
+            self.z * factor,
+            self.w * factor,
+        )
+    }
 }
 
 impl Add<Tetrad> for Tetrad {
@@ -100,5 +109,11 @@ mod tests {
     fn test_neg() {
         let tetrad = Tetrad::new(3.0, -2.0, 5.0, 1.0);
         assert_eq!(-tetrad, Tetrad::new(-3.0, 2.0, -5.0, -1.0));
+    }
+
+    #[test]
+    fn test_scale() {
+        let tetrad = Tetrad::new(3.0, -2.0, 5.0, 1.0);
+        assert_eq!(tetrad.scale(2.0), Tetrad::new(6.0, -4.0, 10.0, 2.0));
     }
 }
