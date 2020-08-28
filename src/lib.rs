@@ -54,6 +54,10 @@ impl Tetrad {
     pub fn normalize(&self) -> Tetrad {
         self.scale_inverse(self.magnitude())
     }
+
+    pub fn dot(&self, rhs: &Tetrad) -> f64 {
+        self.x * rhs.x + self.y * rhs.y + self.z * rhs.z + self.w * rhs.w
+    }
 }
 
 impl Add<Tetrad> for Tetrad {
@@ -161,5 +165,13 @@ mod tests {
             vector.normalize(),
             Tetrad::vector(0.2672612419124244, -0.5345224838248488, 0.8017837257372732)
         );
+    }
+
+    #[test]
+    fn test_dot() {
+        let vector1 = Tetrad::vector(1.0, 2.0, 3.0);
+        let vector2 = Tetrad::vector(2.0, 3.0, 4.0);
+        assert_eq!(vector1.dot(&vector2), 20.0);
+        assert_eq!(vector2.dot(&vector1), 20.0);
     }
 }
