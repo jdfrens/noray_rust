@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+cargo check
+cargo test
+cargo fmt --all -- --check
+cargo clean
+cargo clippy -- -D warnings
+cargo doc
