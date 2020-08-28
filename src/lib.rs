@@ -58,6 +58,14 @@ impl Tetrad {
     pub fn dot(&self, rhs: &Tetrad) -> f64 {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z + self.w * rhs.w
     }
+
+    pub fn cross(&self, rhs: &Tetrad) -> Tetrad {
+        Tetrad::vector(
+            self.y * rhs.z - self.z * rhs.y,
+            self.z * rhs.x - self.x * rhs.z,
+            self.x * rhs.y - self.y * rhs.x,
+        )
+    }
 }
 
 impl Add<Tetrad> for Tetrad {
@@ -173,5 +181,13 @@ mod tests {
         let vector2 = Tetrad::vector(2.0, 3.0, 4.0);
         assert_eq!(vector1.dot(&vector2), 20.0);
         assert_eq!(vector2.dot(&vector1), 20.0);
+    }
+
+    #[test]
+    fn test_cross() {
+        let vector1 = Tetrad::vector(1.0, 2.0, 3.0);
+        let vector2 = Tetrad::vector(2.0, 3.0, 4.0);
+        assert_eq!(vector1.cross(&vector2), Tetrad::vector(-1.0, 2.0, -1.0));
+        assert_eq!(vector2.cross(&vector1), Tetrad::vector(1.0, -2.0, 1.0));
     }
 }
